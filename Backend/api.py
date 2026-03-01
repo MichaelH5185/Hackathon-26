@@ -39,12 +39,13 @@ def receive_csv(userid):
       return jsonify({"error": str(e)}), 500
    models = cn.create_new_models(df, userid)
    model_json = []
-   for m in models:
+   for i in range(len(models)):
+      m = models[i]
       path = os.path.join(os.getcwd(), 'created_models')
       path = os.path.join(path, m)
       model = jm.junctionPredict(path, m, userid)
       stats = model.generate_stats()
-      model_json.append({m : stats})
+      model_json.append({i : stats})
    return jsonify(model_json), 200
 
 if __name__ == '__main__':
