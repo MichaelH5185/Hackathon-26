@@ -4,8 +4,9 @@ import pandas as pd
 import json
 import os
 
-#models = cn.create_new_models('test.csv', 'Michael')
-#print(models)
+df = pd.read_csv('test.csv')
+models = cn.create_new_models(df, 'Michael')
+print(models)
 
 #df_new = cn.clean_data("traffic_main.csv")
 #cutoff_date = '2016-11-01 00:00:00'
@@ -19,12 +20,12 @@ import os
 #stats = model.generate_stats()
 #with open('output.json', 'w') as json_file:
     #json.dump(stats, json_file, indent=4)
-def test(userid):
-    models = []
-    for f in os.listdir("created_models"):
-        f_string = str(f)
-        if str(userid) in f_string:
-            models.append(f_string)
-    return models
+#def test(userid):
+    #models = []
+    ##for f in os.listdir("created_models"):
+    #    f_string = str(f)
+    #    if str(userid) in f_string:
+     #       models.append(f_string)
+   # return models
 
-print(f"{test('Michael')}")
+#rint(f"{test('Michael')}")
