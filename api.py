@@ -26,7 +26,7 @@ def fetch_model(userid):
       model_json.append({m : stats})
    return jsonify(model_json), 200
 
-@app.route('/upload-csv/<string:userid>', methods=['POST'])
+@app.route('/uploadcsv/<string:userid>', methods=['POST'])
 def receive_csv(userid):
    if 'file' not in request.files:
       return jsonify({"error": "No file part"}), 400
@@ -42,7 +42,14 @@ def receive_csv(userid):
       except Exception as e:
         return jsonify({"error": str(e)}), 500
       models = cn.create_new_models(df, userid)
-   return jsonify({"message": f"{len(models)} models created successfully"}), 200
+      model_json = []
+      for m in models:
+         path = os.path.join(os.getcwd(), 'created_models')
+         path = os.path.join(path, m)
+         model = jm.junctionPredict(path, m, userid)
+         stats = model.generate_stats()
+         model_json.append({m : stats})
+   return jsonify(model_json), 200
 
 if __name__ == '__main__':
    app.run(port=5000)
