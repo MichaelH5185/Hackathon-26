@@ -3,6 +3,7 @@ import numpy as np
 import lightgbm as lgb
 from catboost import CatBoostRegressor
 import pandas as pd
+import warnings
 import os
 import pickle
 
@@ -86,8 +87,39 @@ class junctionPredict():
         cbm_dir = os.path.join(p, f"{self.name}-{self.owner}.cbm")
         self.cbm.save_model(cbm_dir)
         joblib.dump(self.model, pkl_dir)
+        warnings.filterwarnings('ignore')
+        df = pd.read_csv("empty_pred.csv")
+        X_vals = df.drop(df.columns[[0, 1, 2]], axis=1)
+        df["Vehicles"] = self.predict(X_vals)
+        df["Vehicles"] = df["Vehicles"].astype(int)
+        df.to_csv(os.path.join(p, "pred.csv"))
+        self.dir = p
         return p
     
     def predict(self, X_vals):
         stack = self.load()
         return stack.predict(X_vals)
+    
+    def generate_stats(self):
+        df = pd.read_csv(os.path.join(self.dir, "pred.csv"))
+        df = df.drop(columns=["dow_sin", "dow_cos", "is_weekend", "is_business_hours", "month_sin", "month_cos"])
+        df['Full-Date'] = f'{df["Month"]}-{df["Date"]}'
+        daily_total = df.groupby(["Month","Date"])["Vehicles"].sum()
+        hourly_avg = df.groupby("Time")["Vehicles"].mean()
+        monthly_avg = df.groupby("Month")["Vehicles"].mean()
+        daily_avg = df.groupby('Day')["Vehicles"].sum()
+        best_day = daily_total.idxmax()
+        stats = {'Overall_Avg': float(df['Vehicles'].mean()),
+                 'Hourly_Avg': hourly_avg.to_dict(), 
+                 'Weekday_Highest':int(daily_avg.idxmax()),
+                 'WH_val':int(daily_avg.max()), 
+                 'Daily_Avg':float(daily_avg.mean()), 
+                 'Monthly_Avg':monthly_avg.to_dict(), 
+                 'Highest_Hour':int(hourly_avg.idxmax()), 
+                 'HH_val': float(hourly_avg.max()),
+                 'Highest_Day': f'{best_day[0]}-{best_day[1]}',
+                 'HD_val': float(daily_total.max()), 
+                 'Highest_Month':int(monthly_avg.idxmax()),
+                 'HM_val':float(monthly_avg.max())}
+        return stats
+        

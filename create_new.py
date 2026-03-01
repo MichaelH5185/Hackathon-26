@@ -7,11 +7,7 @@ import joblib
 from sklearn.metrics import root_mean_squared_error
 import os
 
-def clean_data(file):
-    try:
-        main_df = pd.read_csv(file)
-    except FileNotFoundError:
-        raise("This file does not exist")
+def clean_data(main_df):
     main_df['Time'] = 0
     main_df['Day'] = 0
     main_df['Month'] = 0
@@ -38,7 +34,7 @@ def clean_data(file):
     df["month_cos"] = np.cos(2*np.pi*month_df/12)
     return df
 
-def create_new_models(file, user):
+def create_new_models(df, user):
     MODEL_DIR = os.path.join(os.getcwd(), 'pretrained_models')
     f_models = {
         "v1": os.path.join(MODEL_DIR, "1-model"),
@@ -47,7 +43,7 @@ def create_new_models(file, user):
         "v4": os.path.join(MODEL_DIR, "4-model")
     }
     
-    df = clean_data(file)
+    df = clean_data(df)
     print('cleaned file')
     models = []
     for j in df.iloc[:, 1].unique():
@@ -56,9 +52,9 @@ def create_new_models(file, user):
         split_index = int(len(temp_df) * 0.9)
         train_df = temp_df.iloc[:split_index]
         test_df  = temp_df.iloc[split_index:]
-        X_train = train_df.drop(train_df.columns[[0, 1, 2, 3]], axis=1)
+        X_train = train_df.drop(train_df.columns[[0, 1, 2]], axis=1)
         Y_train = train_df.iloc[:,2]
-        X_test = test_df.drop(test_df.columns[[0, 1, 2, 3]], axis=1)
+        X_test = test_df.drop(test_df.columns[[0, 1, 2]], axis=1)
         Y_test = test_df.iloc[:,2]
         save_path = os.path.join(os.getcwd(), "created_models")
         best_mse = 1000000
