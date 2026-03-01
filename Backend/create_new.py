@@ -12,27 +12,27 @@ def clean_data(main_df):
     main_df['Day'] = 0
     main_df['Month'] = 0
     main_df['Date'] = 0
-    df = main_df.copy()
     warnings.filterwarnings('ignore')
     for index, t in main_df.iterrows():
-        date_time = df.iloc[:, 0][index]
+        date_time =  main_df.iloc[:, 0][index]
         date_time = date_time.split()
         date = date_time[0].split('-')
         time = date_time[1].split(':')
-        df['Time'][index] = int(time[0])
-        df['Month'][index] = int(date[1])
-        df['Date'][index] = int(date[2])
-        df['Day'][index] = dt.date(int(date[0]),int(date[1]),int(date[2])).weekday()
-    day_df = df.iloc[:, 5]
-    month_df = df.iloc[:, 6]
-    hours_df = df.iloc[:, 4]
-    df["dow_sin"] = np.sin(2 * np.pi * (day_df) / 7)
-    df["dow_cos"] = np.cos(2 * np.pi * (day_df) / 7)
-    df["is_weekend"] = main_df.iloc[:,5] >= 5
-    df["is_business_hours"] = hours_df.between(9,17)
-    df["month_sin"] = np.sin(2*np.pi*month_df/12)
-    df["month_cos"] = np.cos(2*np.pi*month_df/12)
-    return df
+        main_df.loc[index, 'Time']= int(time[0])
+        main_df.loc[index, 'Month'] = int(date[1])
+        main_df.loc[index, 'Date'] = int(date[2])
+        main_df.loc[index, 'Day'] = dt.date(int(date[0]),int(date[1]),int(date[2])).weekday()
+    day_df = main_df.iloc[:, 5]
+    month_df = main_df.iloc[:, 6]
+    hours_df = main_df.iloc[:, 4]
+    main_df["dow_sin"] = np.sin(2 * np.pi * (day_df) / 7)
+    main_df["dow_cos"] = np.cos(2 * np.pi * (day_df) / 7)
+    main_df["is_weekend"] = main_df.iloc[:,5] >= 5
+    main_df["is_business_hours"] = hours_df.between(9,17)
+    main_df["month_sin"] = np.sin(2*np.pi*month_df/12)
+    main_df["month_cos"] = np.cos(2*np.pi*month_df/12)
+    main_df["Vehicles"] = main_df["Vehicles"].astype(int)
+    return main_df
 
 def create_new_models(df, user):
     MODEL_DIR = os.path.join(os.getcwd(), 'pretrained_models')

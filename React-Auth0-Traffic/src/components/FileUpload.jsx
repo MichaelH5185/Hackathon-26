@@ -62,6 +62,7 @@ function FileUpload( {transferData} ) {
     const processData = () => {
         axios.post(`http://localhost:5000/uploadcsv/${username}`, { jsonData })
         .then(response => { 
+            console.log(response.data);
             // transferData();
         })
         .catch(error => {
@@ -72,7 +73,7 @@ function FileUpload( {transferData} ) {
     return (
         <div className="d-grid gap-2 col-2 mx-auto p-2 bg-light-subtle bg-gradient mt-4 rounded">
             <span className="text-primary text-center"></span>
-            <div class="mb-3">
+            <div className="mb-3">
                 <label htmlFor="csvFile" className="form-label">Traffic Data File</label>
                 <input className="form-control" type="file" accept=".csv" id="csvFile" onChange={fileChange}/>
             </div>

@@ -4,9 +4,6 @@ import pandas as pd
 import json
 import os
 
-df = pd.read_csv('test.csv')
-models = cn.create_new_models(df, 'Michael')
-print(models)
 
 #df_new = cn.clean_data("traffic_main.csv")
 #cutoff_date = '2016-11-01 00:00:00'
@@ -29,3 +26,16 @@ print(models)
    # return models
 
 #rint(f"{test('Michael')}")
+uploaded_file = os.path.join(os.getcwd(), "test_2 - Sheet1.csv")
+userid = "hotramichael"
+df = pd.read_csv(uploaded_file, header=None)
+df.columns = ["DateTime","Junction","Vehicles"]
+models = cn.create_new_models(df, userid)
+model_json = []
+for m in models:
+    path = os.path.join(os.getcwd(), 'created_models')
+    path = os.path.join(path, m)
+    model = jm.junctionPredict(path, m, userid)
+    stats = model.generate_stats()
+    model_json.append({m : stats})
+print(model_json)
